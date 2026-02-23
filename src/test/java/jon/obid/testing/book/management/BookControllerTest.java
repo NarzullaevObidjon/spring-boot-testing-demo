@@ -12,22 +12,20 @@ package jon.obid.testing.book.management;
  *   - The target controller (BookController)
  *   - The entire MVC infrastructure (DispatcherServlet, HandlerMapping, etc.)
  *   - Jackson for JSON (de)serialization
+ *   - Spring Security auto-configuration (included automatically in Boot 3.x)
  *
  *  It does NOT load:
  *   - JPA repositories or the database
- *   - Service beans (replaced with @MockitoBean)
+ *   - Service beans (replaced with @MockBean)
  *   - Any other controllers
  *
- *  This narrow scope means tests start in milliseconds rather than seconds,
- *  and failures are tightly scoped to the web layer.
+ *  Spring Boot 3.x vs 4.x:
+ *   In Boot 3.x, @WebMvcTest already includes Spring Security auto-configuration —
+ *   no @ImportAutoConfiguration is needed. Only the custom WebSecurityConfig class
+ *   must be brought in via @Import because it is not auto-scanned by the slice.
  *
- *  Spring Boot 4.x changes addressed here:
- *   1. @WebMvcTest no longer auto-includes Spring Security auto-configuration.
- *      We add it explicitly via @ImportAutoConfiguration.
- *   2. @MockitoBean replaces the deprecated @MockBean from Spring Boot 3.4+.
- *      It registers a Mockito mock as a Spring bean in the test context.
- *   3. JwtDecoder must be mocked because WebSecurityConfig declares a JWT
- *      resource server — without a JwtDecoder bean the context will fail to start.
+ *  @MockBean (Boot 3.x) replaces the real bean in the Spring context with a mock.
+ *  Note: @MockBean was renamed @MockitoBean in Spring Boot 3.4+ / Boot 4.x.
  *
  *  What MockMvc gives us:
  *   - perform(...)        — fire a synthetic HTTP request (no real server needed)
@@ -44,16 +42,12 @@ import java.util.List;
 import jon.obid.testing.config.WebSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
-import org.springframework.boot.security.autoconfigure.web.servlet.SecurityFilterAutoConfiguration;
-import org.springframework.boot.security.autoconfigure.web.servlet.ServletWebSecurityAutoConfiguration;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -63,25 +57,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-// Spring Boot 4.x: @WebMvcTest no longer imports security auto-configs automatically.
-// @Import(WebSecurityConfig.class) brings in the security rules.
-// @ImportAutoConfiguration adds the three auto-configs that activate those rules.
+// Boot 3.x: @WebMvcTest includes Spring Security auto-configuration automatically.
+// @Import(WebSecurityConfig.class) brings in the custom security rules.
+// No @ImportAutoConfiguration needed (unlike Boot 4.x).
 @WebMvcTest(BookController.class)
 @Import(WebSecurityConfig.class)
-@ImportAutoConfiguration({
-    SecurityAutoConfiguration.class,
-    SecurityFilterAutoConfiguration.class,
-    ServletWebSecurityAutoConfiguration.class
-})
 class BookControllerTest {
 
-  // @MockitoBean registers a Mockito mock as a Spring bean, replacing any real implementation.
+  // @MockBean registers a Mockito mock as a Spring bean, replacing any real implementation.
   // BookManagementService is not part of the web slice — we control it entirely via stubs.
-  @MockitoBean private BookManagementService bookManagementService;
+  @MockBean private BookManagementService bookManagementService;
 
   // WebSecurityConfig configures a JWT resource server, which requires a JwtDecoder bean.
   // No real Keycloak runs during tests, so we provide a mock to satisfy the dependency.
-  @MockitoBean private JwtDecoder jwtDecoder;
+  @MockBean private JwtDecoder jwtDecoder;
 
   // MockMvc is auto-configured by @WebMvcTest — inject it directly
   @Autowired private MockMvc mockMvc;
@@ -140,8 +129,6 @@ class BookControllerTest {
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
-  // A small factory method keeps the test bodies clean and readable.
-  // All fields are set explicitly so test assertions are self-documenting.
   private Book createBook(Long id, String isbn, String title, String author,
       String description, String genre, Long pages, String publisher, String thumbnailUrl) {
     Book result = new Book();

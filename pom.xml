@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.3</version>
+        <version>3.5.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>jon.obid</groupId>
@@ -19,7 +19,6 @@
         <testcontainers.version>1.21.1</testcontainers.version>
         <wiremock.version>3.13.0</wiremock.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <mockito.version>5.11.0</mockito.version>
         <selenide.version>7.9.3</selenide.version>
         <selenium.version>4.33.0</selenium.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
@@ -105,22 +104,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!-- Spring Boot 4.x: test slices are now separate starters -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-restclient-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

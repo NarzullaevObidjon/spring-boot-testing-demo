@@ -3,7 +3,7 @@ package jon.obid.testing.book.management;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import org.hibernate.annotations.NaturalId;
 
 @Entity

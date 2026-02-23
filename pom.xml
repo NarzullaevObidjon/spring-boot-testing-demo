@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.3</version>
+        <version>2.4.13</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>jon.obid</groupId>
@@ -14,12 +14,12 @@
     <name>testing</name>
     <description>testing</description>
     <properties>
-        <java.version>21</java.version>
+        <!-- Java 17 is required for text-block syntax (finalized in Java 15) -->
+        <java.version>17</java.version>
         <node.version>v18.16.0</node.version>
         <testcontainers.version>1.21.1</testcontainers.version>
         <wiremock.version>3.13.0</wiremock.version>
         <p6spy.version>3.9.1</p6spy.version>
-        <mockito.version>5.11.0</mockito.version>
         <selenide.version>7.9.3</selenide.version>
         <selenium.version>4.33.0</selenium.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
@@ -107,20 +107,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Spring Boot 4.x: test slices are now separate starters -->
+        <!-- mockito-inline enables Mockito.mockStatic() in Mockito 3.x (managed by Boot 2.4.x).
+             In Mockito 5.x (Boot 3.x+) static mocking is included in mockito-core by default. -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-restclient-test</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

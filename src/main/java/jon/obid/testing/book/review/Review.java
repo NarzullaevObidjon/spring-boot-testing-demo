@@ -2,7 +2,7 @@ package jon.obid.testing.book.review;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import jon.obid.testing.book.management.Book;
 import jon.obid.testing.book.management.User;
 

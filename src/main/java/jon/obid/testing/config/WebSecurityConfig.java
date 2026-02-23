@@ -27,7 +27,7 @@ public class WebSecurityConfig {
                     .permitAll()
                     .requestMatchers("/api/**")
                     .authenticated()
-                    .requestMatchers(org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest.to(org.springframework.boot.health.actuate.endpoint.HealthEndpoint.class))
+                    .requestMatchers(org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest.to(org.springframework.boot.actuate.health.HealthEndpoint.class))
                     .permitAll()
                     .anyRequest()
                     .permitAll())

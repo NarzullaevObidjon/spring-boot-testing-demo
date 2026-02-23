@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    password: root
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/testing
+    driver-class-name: org.postgresql.Driver
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8888/auth/realms/spring
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: true
+    generate-ddl: true
+  threads:
+    virtual:
+      enabled: true
+
+clients:
+  open-library:
+    base-url: https://openlibrary.org

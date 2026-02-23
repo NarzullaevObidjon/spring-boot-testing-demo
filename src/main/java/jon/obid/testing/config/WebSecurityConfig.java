@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -12,22 +12,22 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
     httpSecurity
-        .authorizeHttpRequests(
+        .authorizeRequests(
             authorize ->
                 authorize
-                    .requestMatchers(HttpMethod.GET, "/api/books")
+                    .antMatchers(HttpMethod.GET, "/api/books")
                     .permitAll()
-                    .requestMatchers(HttpMethod.GET, "/api/books/reviews")
+                    .antMatchers(HttpMethod.GET, "/api/books/reviews")
                     .permitAll()
-                    .requestMatchers("/api/**")
+                    .antMatchers("/api/**")
                     .authenticated()
-                    .requestMatchers(org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest.to(org.springframework.boot.health.actuate.endpoint.HealthEndpoint.class))
+                    .requestMatchers(org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest.to(org.springframework.boot.actuate.health.HealthEndpoint.class))
                     .permitAll()
                     .anyRequest()
                     .permitAll())

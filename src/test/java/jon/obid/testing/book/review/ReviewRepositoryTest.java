@@ -30,7 +30,6 @@ package jon.obid.testing.book.review;
  *   Prevents @DataJpaTest from swapping the configured DataSource with its own H2,
  *   so our custom P6Spy URL is used instead.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

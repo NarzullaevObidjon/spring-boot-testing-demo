@@ -20,7 +20,6 @@ package jon.obid.testing;
  *  Spring Boot 3.x vs 4.x:
  *   @MockBean (Boot 3.x) replaces @MockitoBean (Boot 4.x) — same behaviour, different name.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

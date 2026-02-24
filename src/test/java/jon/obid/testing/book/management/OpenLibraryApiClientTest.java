@@ -30,7 +30,6 @@ package jon.obid.testing.book.management;
  *    Attempt 2 — 200 OK but body delayed 2 s    → exceeds 1 s read timeout → retry
  *    Attempt 3 — 200 OK immediately             → success
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

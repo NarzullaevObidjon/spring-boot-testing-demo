@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class OpenLibraryRestTemplateApiClient {
 
-  private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     public OpenLibraryRestTemplateApiClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -22,41 +22,41 @@ public class OpenLibraryRestTemplateApiClient {
 
     public Book fetchMetadataForBook(String isbn) {
 
-    HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-    headers.set("X-Custom-Auth", "Duke42");
-    headers.set("X-Customer-Id", "42");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.set("X-Custom-Auth", "Duke42");
+        headers.set("X-Customer-Id", "42");
 
-    HttpEntity<Void> entity = new HttpEntity<>(headers);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-    ObjectNode result =
-        restTemplate
-            .exchange(
-                "https://openlibrary.org/api/books?jscmd=data&format=json&bibkeys={isbn}",
-                HttpMethod.GET,
-                entity,
-                ObjectNode.class,
-                isbn)
-            .getBody();
+        ObjectNode result =
+                restTemplate
+                        .exchange(
+                                "https://openlibrary.org/api/books?jscmd=data&format=json&bibkeys={isbn}",
+                                HttpMethod.GET,
+                                entity,
+                                ObjectNode.class,
+                                isbn)
+                        .getBody();
 
-    JsonNode content = result.get(isbn);
+        JsonNode content = result.get(isbn);
 
-    return convertToBook(isbn, content);
-  }
+        return convertToBook(isbn, content);
+    }
 
-  private Book convertToBook(String isbn, JsonNode content) {
-    Book book = new Book();
-    book.setIsbn(isbn);
-    book.setThumbnailUrl(content.get("cover").get("small").asText());
-    book.setTitle(content.get("title").asText());
-    book.setAuthor(content.get("authors").get(0).get("name").asText());
-    book.setPublisher(content.get("publishers").get(0).get("name").asText("n.A."));
-    book.setPages(content.get("number_of_pages").asLong(0));
-    book.setDescription(content.get("notes") == null ? "n.A" : content.get("notes").asText("n.A."));
-    book.setGenre(
-        content.get("subjects") == null
-            ? "n.A"
-            : content.get("subjects").get(0).get("name").asText("n.A."));
-    return book;
-  }
+    private Book convertToBook(String isbn, JsonNode content) {
+        Book book = new Book();
+        book.setIsbn(isbn);
+        book.setThumbnailUrl(content.get("cover").get("small").asText());
+        book.setTitle(content.get("title").asText());
+        book.setAuthor(content.get("authors").get(0).get("name").asText());
+        book.setPublisher(content.get("publishers").get(0).get("name").asText("n.A."));
+        book.setPages(content.get("number_of_pages").asLong(0));
+        book.setDescription(content.get("notes") == null ? "n.A" : content.get("notes").asText("n.A."));
+        book.setGenre(
+                content.get("subjects") == null
+                        ? "n.A"
+                        : content.get("subjects").get(0).get("name").asText("n.A."));
+        return book;
+    }
 }

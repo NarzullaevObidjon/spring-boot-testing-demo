@@ -11,48 +11,48 @@ import reactor.util.retry.Retry;
 @Component
 public class OpenLibraryApiClient {
 
-  private final WebClient openLibraryWebClient;
+    private final WebClient openLibraryWebClient;
 
-  public OpenLibraryApiClient(WebClient openLibraryWebClient) {
-    this.openLibraryWebClient = openLibraryWebClient;
-  }
+    public OpenLibraryApiClient(WebClient openLibraryWebClient) {
+        this.openLibraryWebClient = openLibraryWebClient;
+    }
 
-  public Book fetchMetadataForBook(String isbn) {
+    public Book fetchMetadataForBook(String isbn) {
 
-    ObjectNode result =
-        openLibraryWebClient
-            .get()
-            .uri(
-                "/api/books",
-                uriBuilder ->
-                    uriBuilder
-                        .queryParam("jscmd", "data")
-                        .queryParam("format", "json")
-                        .queryParam("bibkeys", isbn)
-                        .build())
-            .retrieve()
-            .bodyToMono(ObjectNode.class)
-            .retryWhen(Retry.fixedDelay(2, Duration.ofMillis(200)))
-            .block();
+        ObjectNode result =
+                openLibraryWebClient
+                        .get()
+                        .uri(
+                                "/api/books",
+                                uriBuilder ->
+                                        uriBuilder
+                                                .queryParam("jscmd", "data")
+                                                .queryParam("format", "json")
+                                                .queryParam("bibkeys", isbn)
+                                                .build())
+                        .retrieve()
+                        .bodyToMono(ObjectNode.class)
+                        .retryWhen(Retry.fixedDelay(2, Duration.ofMillis(200)))
+                        .block();
 
-    JsonNode content = result.get(isbn);
+        JsonNode content = result.get(isbn);
 
-    return convertToBook(isbn, content);
-  }
+        return convertToBook(isbn, content);
+    }
 
-  private Book convertToBook(String isbn, JsonNode content) {
-    Book book = new Book();
-    book.setIsbn(isbn);
-    book.setThumbnailUrl(content.get("cover").get("small").asText());
-    book.setTitle(content.get("title").asText());
-    book.setAuthor(content.get("authors").get(0).get("name").asText());
-    book.setPublisher(content.get("publishers").get(0).get("name").asText("n.A."));
-    book.setPages(content.get("number_of_pages").asLong(0));
-    book.setDescription(content.get("notes") == null ? "n.A" : content.get("notes").asText("n.A."));
-    book.setGenre(
-        content.get("subjects") == null
-            ? "n.A"
-            : content.get("subjects").get(0).get("name").asText("n.A."));
-    return book;
-  }
+    private Book convertToBook(String isbn, JsonNode content) {
+        Book book = new Book();
+        book.setIsbn(isbn);
+        book.setThumbnailUrl(content.get("cover").get("small").asText());
+        book.setTitle(content.get("title").asText());
+        book.setAuthor(content.get("authors").get(0).get("name").asText());
+        book.setPublisher(content.get("publishers").get(0).get("name").asText("n.A."));
+        book.setPages(content.get("number_of_pages").asLong(0));
+        book.setDescription(content.get("notes") == null ? "n.A" : content.get("notes").asText("n.A."));
+        book.setGenre(
+                content.get("subjects") == null
+                        ? "n.A"
+                        : content.get("subjects").get(0).get("name").asText("n.A."));
+        return book;
+    }
 }

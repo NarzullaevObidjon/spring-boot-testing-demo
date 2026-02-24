@@ -17,7 +17,6 @@ package jon.obid.testing.book.review;
  *  class runs and stops it after.  The container is declared as a static field so it
  *  is shared across all tests in the class — one container per class, not per test.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -74,7 +73,7 @@ class ReviewRepositoryNoInMemoryTest {
           System.out.println(reviewStatistic.getAvg());
           System.out.println(reviewStatistic.getIsbn());
           System.out.println(reviewStatistic.getRatings());
-          System.out.println("");
+          System.out.println();
         });
 
     assertEquals(2, result.get(0).getRatings());

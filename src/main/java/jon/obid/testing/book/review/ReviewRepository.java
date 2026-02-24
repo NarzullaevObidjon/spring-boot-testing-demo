@@ -9,21 +9,21 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-  @Query(
-      value =
-          "SELECT id, ratings, isbn, avg "
-              + "FROM books "
-              + "JOIN "
-              + "(SELECT book_id, ROUND(AVG(rating), 2) AS avg, COUNT(*) ratings FROM reviews group by book_id) AS statistics "
-              + "ON statistics.book_id = id;",
-      nativeQuery = true)
-  List<ReviewStatistic> getReviewStatistics();
+    @Query(
+            value =
+                    "SELECT id, ratings, isbn, avg "
+                            + "FROM books "
+                            + "JOIN "
+                            + "(SELECT book_id, ROUND(AVG(rating), 2) AS avg, COUNT(*) ratings FROM reviews group by book_id) AS statistics "
+                            + "ON statistics.book_id = id;",
+            nativeQuery = true)
+    List<ReviewStatistic> getReviewStatistics();
 
-  List<Review> findTop5ByOrderByRatingDescCreatedAtDesc();
+    List<Review> findTop5ByOrderByRatingDescCreatedAtDesc();
 
-  List<Review> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    List<Review> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-  void deleteByIdAndBookIsbn(Long reviewId, String isbn);
+    void deleteByIdAndBookIsbn(Long reviewId, String isbn);
 
-  Optional<Review> findByIdAndBookIsbn(Long reviewId, String isbn);
+    Optional<Review> findByIdAndBookIsbn(Long reviewId, String isbn);
 }

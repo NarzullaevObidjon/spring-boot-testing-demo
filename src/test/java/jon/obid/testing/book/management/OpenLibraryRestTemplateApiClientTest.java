@@ -23,7 +23,6 @@ package jon.obid.testing.book.management;
  *   Package change: RestTemplateBuilder moved in Boot 4.x to org.springframework.boot.restclient;
  *   here we use the Boot 3.x location: org.springframework.boot.web.client.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

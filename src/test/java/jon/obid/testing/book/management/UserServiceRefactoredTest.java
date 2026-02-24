@@ -26,7 +26,6 @@ package jon.obid.testing.book.management;
  *  Clock injection over static mocking. The same principle applies to any other
  *  "environmental" value (random numbers, UUIDs, system properties).
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

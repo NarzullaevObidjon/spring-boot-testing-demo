@@ -35,7 +35,6 @@ package jon.obid.testing.book.review;
  *   In Boot 3.x, @WebMvcTest includes Spring Security auto-configuration automatically —
  *   no @ImportAutoConfiguration needed. @MockBean replaces @MockitoBean from Boot 4.x.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

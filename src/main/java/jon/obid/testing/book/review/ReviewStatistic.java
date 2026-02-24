@@ -3,11 +3,11 @@ package jon.obid.testing.book.review;
 import java.math.BigDecimal;
 
 public interface ReviewStatistic {
-  Long getId();
+    Long getId();
 
-  Long getRatings();
+    Long getRatings();
 
-  String getIsbn();
+    String getIsbn();
 
-  BigDecimal getAvg();
+    BigDecimal getAvg();
 }

@@ -33,7 +33,6 @@ package jon.obid.testing.book.management;
  *   - andDo(print())      — print the full request/response to stdout for debugging
  *   - andReturn()         — retrieve the MvcResult for further manual inspection
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -64,83 +63,86 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(WebSecurityConfig.class)
 class BookControllerTest {
 
-  // @MockBean registers a Mockito mock as a Spring bean, replacing any real implementation.
-  // BookManagementService is not part of the web slice — we control it entirely via stubs.
-  @MockBean private BookManagementService bookManagementService;
+    // @MockBean registers a Mockito mock as a Spring bean, replacing any real implementation.
+    // BookManagementService is not part of the web slice — we control it entirely via stubs.
+    @MockBean
+    private BookManagementService bookManagementService;
 
-  // WebSecurityConfig configures a JWT resource server, which requires a JwtDecoder bean.
-  // No real Keycloak runs during tests, so we provide a mock to satisfy the dependency.
-  @MockBean private JwtDecoder jwtDecoder;
+    // WebSecurityConfig configures a JWT resource server, which requires a JwtDecoder bean.
+    // No real Keycloak runs during tests, so we provide a mock to satisfy the dependency.
+    @MockBean
+    private JwtDecoder jwtDecoder;
 
-  // MockMvc is auto-configured by @WebMvcTest — inject it directly
-  @Autowired private MockMvc mockMvc;
+    // MockMvc is auto-configured by @WebMvcTest — inject it directly
+    @Autowired
+    private MockMvc mockMvc;
 
-  // ── Tests ─────────────────────────────────────────────────────────────────
+    // ── Tests ─────────────────────────────────────────────────────────────────
 
-  @Test
-  void shouldGetEmptyArrayWhenNoBooksExists() throws Exception {
-    // Mockito returns an empty list by default for unstubbed Collection return types,
-    // so no explicit stub is needed here — this tests the zero-books happy path.
-    MvcResult mvcResult =
+    @Test
+    void shouldGetEmptyArrayWhenNoBooksExists() throws Exception {
+        // Mockito returns an empty list by default for unstubbed Collection return types,
+        // so no explicit stub is needed here — this tests the zero-books happy path.
+        MvcResult mvcResult =
+                this.mockMvc
+                        .perform(get("/api/books").header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
+                        .andExpect(status().is(200))
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("$.size()", is(0)))
+                        .andDo(print())
+                        .andReturn();
+    }
+
+    @Test
+    void shouldNotReturnXML() throws Exception {
+        // GET /api/books only produces JSON — requesting XML must yield 406 Not Acceptable.
+        // This verifies the produces = APPLICATION_JSON_VALUE constraint on the controller.
         this.mockMvc
-            .perform(get("/api/books").header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
-            .andExpect(status().is(200))
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.size()", is(0)))
-            .andDo(print())
-            .andReturn();
-  }
+                .perform(get("/api/books").header(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML))
+                .andExpect(status().isNotAcceptable());
+    }
 
-  @Test
-  void shouldNotReturnXML() throws Exception {
-    // GET /api/books only produces JSON — requesting XML must yield 406 Not Acceptable.
-    // This verifies the produces = APPLICATION_JSON_VALUE constraint on the controller.
-    this.mockMvc
-        .perform(get("/api/books").header(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML))
-        .andExpect(status().isNotAcceptable());
-  }
+    @Test
+    void shouldGetBooksWhenServiceReturnsBooks() throws Exception {
 
-  @Test
-  void shouldGetBooksWhenServiceReturnsBooks() throws Exception {
+        Book bookOne =
+                createBook(1L, "42", "Java 14", "Mike", "Good book", "Software Engineering",
+                        200L, "Oracle", "ftp://localhost:42");
 
-    Book bookOne =
-        createBook(1L, "42", "Java 14", "Mike", "Good book", "Software Engineering",
-            200L, "Oracle", "ftp://localhost:42");
+        Book bookTwo =
+                createBook(2L, "84", "Java 15", "Duke", "Good book", "Software Engineering",
+                        200L, "Oracle", "ftp://localhost:42");
 
-    Book bookTwo =
-        createBook(2L, "84", "Java 15", "Duke", "Good book", "Software Engineering",
-            200L, "Oracle", "ftp://localhost:42");
+        when(bookManagementService.getAllBooks()).thenReturn(List.of(bookOne, bookTwo));
 
-    when(bookManagementService.getAllBooks()).thenReturn(List.of(bookOne, bookTwo));
+        this.mockMvc
+                .perform(get("/api/books").header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
+                .andExpect(status().is(200))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.size()", is(2)))
+                .andExpect(jsonPath("$[0].isbn", is("42")))
+                // id field is annotated @JsonIgnore on Book — verify it is NOT serialized to the response
+                .andExpect(jsonPath("$[0].id").doesNotExist())
+                .andExpect(jsonPath("$[0].title", is("Java 14")))
+                .andExpect(jsonPath("$[1].isbn", is("84")))
+                .andExpect(jsonPath("$[1].id").doesNotExist())
+                .andExpect(jsonPath("$[1].title", is("Java 15")));
+    }
 
-    this.mockMvc
-        .perform(get("/api/books").header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON))
-        .andExpect(status().is(200))
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.size()", is(2)))
-        .andExpect(jsonPath("$[0].isbn", is("42")))
-        // id field is annotated @JsonIgnore on Book — verify it is NOT serialized to the response
-        .andExpect(jsonPath("$[0].id").doesNotExist())
-        .andExpect(jsonPath("$[0].title", is("Java 14")))
-        .andExpect(jsonPath("$[1].isbn", is("84")))
-        .andExpect(jsonPath("$[1].id").doesNotExist())
-        .andExpect(jsonPath("$[1].title", is("Java 15")));
-  }
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
-
-  private Book createBook(Long id, String isbn, String title, String author,
-      String description, String genre, Long pages, String publisher, String thumbnailUrl) {
-    Book result = new Book();
-    result.setId(id);
-    result.setIsbn(isbn);
-    result.setTitle(title);
-    result.setAuthor(author);
-    result.setDescription(description);
-    result.setGenre(genre);
-    result.setPages(pages);
-    result.setPublisher(publisher);
-    result.setThumbnailUrl(thumbnailUrl);
-    return result;
-  }
+    private Book createBook(Long id, String isbn, String title, String author,
+                            String description, String genre, Long pages, String publisher, String thumbnailUrl) {
+        Book result = new Book();
+        result.setId(id);
+        result.setIsbn(isbn);
+        result.setTitle(title);
+        result.setAuthor(author);
+        result.setDescription(description);
+        result.setGenre(genre);
+        result.setPages(pages);
+        result.setPublisher(publisher);
+        result.setThumbnailUrl(thumbnailUrl);
+        return result;
+    }
 }

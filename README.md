@@ -29,7 +29,7 @@ and you will cover every major testing technique used in professional Spring Boo
 7. [Phase 3 — Integration Test (Full Spring Context)](#phase-3--integration-test-full-spring-context)
    - [Step 11: TestingApplicationTests](#step-11-testingapplicationtests)
 8. [Supporting Test Resources](#supporting-test-resources)
-9. [Key Spring Boot 4.x Changes](#key-spring-boot-4x-changes)
+9. [Key Spring Boot 3.x Changes](#key-spring-boot-3x-changes)
 10. [Dependency Reference](#dependency-reference)
 
 ---
@@ -325,11 +325,11 @@ They are slower than unit tests (a context must start) but much faster than a fu
 **What `@WebMvcTest` loads:**
 - The target controller (`BookController`)
 - `DispatcherServlet`, `HandlerMapping`, Jackson, argument resolvers
-- Spring Security (via `@Import` + `@ImportAutoConfiguration` in Boot 4.x)
+- Spring Security (auto-included in Boot 3.x via `@Import(WebSecurityConfig.class)`)
 
 **What it does NOT load:**
 - JPA repositories or the database
-- Service beans (replaced with `@MockitoBean`)
+- Service beans (replaced with `@MockBean` / `@MockitoBean` since Boot 3.4)
 - Any other controllers
 
 **`MockMvc` — the heart of web-layer testing:**
@@ -350,17 +350,13 @@ this.mockMvc
 2. XML `Accept` header → `406 Not Acceptable`
 3. Two books returned → JSON array with correct fields, `id` hidden
 
-**Spring Boot 4.x note:** `@WebMvcTest` no longer auto-includes Spring Security
-auto-configuration. It must be added explicitly:
+**Spring Boot 3.x note:** `@WebMvcTest` auto-includes Spring Security auto-configuration.
+Only the custom `WebSecurityConfig` needs to be imported explicitly:
 ```java
 @WebMvcTest(BookController.class)
 @Import(WebSecurityConfig.class)
-@ImportAutoConfiguration({
-    SecurityAutoConfiguration.class,
-    SecurityFilterAutoConfiguration.class,
-    ServletWebSecurityAutoConfiguration.class
-})
 ```
+> In Spring Boot 4.x this changes: security auto-configuration must be added manually via `@ImportAutoConfiguration`.
 
 ---
 
@@ -561,13 +557,14 @@ Loaded at class-load time in a `static {}` block to avoid repeated I/O across te
 that intercepts `RestTemplate` calls at the Spring level. No actual network activity
 occurs.
 
-**Spring Boot 4.x gotcha — `RestTemplate` is no longer auto-registered:**
+**`RestTemplate` must be provided explicitly:**
 ```java
 @RestClientTest(OpenLibraryRestTemplateApiClient.class)
 class OpenLibraryRestTemplateApiClientTest {
 
-    // Boot 4.x: RestTemplateAutoConfiguration only registers RestTemplateBuilder, not RestTemplate.
+    // RestTemplateAutoConfiguration registers RestTemplateBuilder, not a RestTemplate bean.
     // We provide the bean explicitly so MockRestServiceServer can wire into it.
+    // Uses Boot 3.x package: org.springframework.boot.web.client.RestTemplateBuilder
     @TestConfiguration
     static class RestTemplateConfig {
         @Bean
@@ -627,8 +624,9 @@ void contextLoads() {
 **JwtDecoder mock:**
 ```java
 // No Keycloak runs during tests — JwtDecoder cannot be auto-configured from issuer-uri.
-// @MockitoBean replaces the auto-configured bean with a Mockito mock so the
-// SecurityFilterChain can start without a live identity provider.
+// @MockitoBean (introduced in Boot 3.4) replaces the auto-configured bean with a
+// Mockito mock so the SecurityFilterChain can start without a live identity provider.
+// Note: Boot 4.x keeps the same @MockitoBean annotation.
 @MockitoBean
 JwtDecoder jwtDecoder;
 ```
@@ -663,20 +661,21 @@ appears in your test console alongside Spring's log output).
 
 ---
 
-## Key Spring Boot 4.x Changes
+## Key Spring Boot 3.x Changes
 
-This project uses Spring Boot **4.0.3**, which has several breaking changes compared
-to 3.x. These are all addressed in the test code and documented inline.
+This project uses Spring Boot **3.5.0**. The table below highlights what changed
+when migrating from Spring Boot 2.x to 3.x, and what will change again in 4.x.
 
-| Change | Boot 3.x | Boot 4.x |
-|--------|----------|----------|
-| Jackson group ID | `com.fasterxml.jackson.databind` | `tools.jackson.databind` |
-| `@MockBean` | `org.springframework.boot.test.mock.mockito.MockBean` | `@MockitoBean` via `@TestContext` |
-| `RestTemplateBuilder` package | `org.springframework.boot.web.client` | `org.springframework.boot.restclient` |
-| `@WebMvcTest` + security | Auto-included | Must add `@ImportAutoConfiguration` explicitly |
-| `RestTemplate` in `@RestClientTest` | Auto-registered | Must provide `@TestConfiguration` bean |
-| Test slice starters | Bundled in `spring-boot-starter-test` | Separate starters: `spring-boot-starter-webmvc-test`, `spring-boot-starter-data-jpa-test`, `spring-boot-starter-restclient-test` |
-| JWT resource server auto-config | `spring-security-oauth2-jose` | `spring-boot-starter-oauth2-resource-server` |
+| Area | Boot 2.x | Boot 3.x (this branch) | Boot 4.x |
+|------|----------|------------------------|----------|
+| JPA / Validation | `javax.persistence.*`, `javax.validation.*` | `jakarta.persistence.*`, `jakarta.validation.*` | `jakarta.*` |
+| Method security | `@EnableGlobalMethodSecurity` | `@EnableMethodSecurity` | `@EnableMethodSecurity` |
+| URL matchers | `.antMatchers()` | `.requestMatchers()` | `.requestMatchers()` |
+| Authorization DSL | `.authorizeRequests()` | `.authorizeHttpRequests()` | `.authorizeHttpRequests()` |
+| Mock annotation | `@MockBean` | `@MockBean` → `@MockitoBean` (3.4+) | `@MockitoBean` |
+| `RestTemplateBuilder` package | `org.springframework.boot.web.client` | `org.springframework.boot.web.client` | `org.springframework.boot.restclient` |
+| `@WebMvcTest` + security | Auto-included | Auto-included | Must add `@ImportAutoConfiguration` explicitly |
+| Test slice starters | Bundled in `spring-boot-starter-test` | Bundled in `spring-boot-starter-test` | Separate starters per slice |
 
 ---
 
@@ -684,10 +683,7 @@ to 3.x. These are all addressed in the test code and documented inline.
 
 | Dependency | Purpose |
 |------------|---------|
-| `spring-boot-starter-test` | JUnit 5, Mockito, AssertJ, Hamcrest, MockMvc |
-| `spring-boot-starter-webmvc-test` | `@WebMvcTest` slice (Boot 4.x separate starter) |
-| `spring-boot-starter-data-jpa-test` | `@DataJpaTest` slice (Boot 4.x separate starter) |
-| `spring-boot-starter-restclient-test` | `@RestClientTest` slice (Boot 4.x separate starter) |
+| `spring-boot-starter-test` | JUnit 5, Mockito, AssertJ, Hamcrest, MockMvc, `@WebMvcTest`, `@DataJpaTest`, `@RestClientTest` |
 | `spring-security-test` | `.with(jwt())`, `SecurityMockMvcRequestPostProcessors` |
 | `testcontainers-bom` + `postgresql` | Real PostgreSQL via Docker |
 | `testcontainers:junit-jupiter` | `@Testcontainers`, `@Container` lifecycle management |

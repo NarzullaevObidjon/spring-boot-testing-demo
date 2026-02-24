@@ -37,7 +37,7 @@ package jon.obid.testing.book.management;
  *   JSON stubs live in src/test/resources/stubs/openlibrary/ and are loaded via
  *   ClassPathResource so they are read from the test classpath automatically.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

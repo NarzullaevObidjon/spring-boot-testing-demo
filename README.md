@@ -1,6 +1,5 @@
 # Spring Boot Testing Masterclass
 
-> **Author:** Obidjon Sattarov — obidsattarovich3600@gmail.com
 > **Stack:** Spring Boot 4.0.3 · Java 21 · JUnit 5 · Mockito 5 · Testcontainers 1.21
 
 This project is a structured, progressive guide to testing a Spring Boot application.

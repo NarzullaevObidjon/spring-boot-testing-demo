@@ -37,7 +37,7 @@ package jon.obid.testing.book.review;
  *     — executes the given SQL script before the annotated test method runs.
  *       Used here to populate the database with fixture data for statistics tests.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

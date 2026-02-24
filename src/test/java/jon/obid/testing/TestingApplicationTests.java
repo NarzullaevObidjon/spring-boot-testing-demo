@@ -33,7 +33,7 @@ package jon.obid.testing;
  *   and is expensive.  Use slice tests for focused testing; use @SpringBootTest only
  *   to verify that all the pieces fit together at startup.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

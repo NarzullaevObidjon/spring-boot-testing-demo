@@ -24,7 +24,7 @@ package jon.obid.testing.book.management;
  *   Inject java.time.Clock as a Spring bean so time can be controlled via a
  *   simple @Mock — no byte-code tricks, fully thread-safe, and much simpler.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

@@ -36,7 +36,7 @@ package jon.obid.testing.book.review;
  *   - @MockitoBean replaces the deprecated @MockBean from Spring Boot 3.4+
  *   - Jackson 3.x uses tools.jackson.databind (not com.fasterxml.jackson.databind)
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

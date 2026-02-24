@@ -34,7 +34,7 @@ package jon.obid.testing.book.review;
  *   embedded H2. Replace.NONE disables that substitution so our custom P6Spy URL
  *   is used instead.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

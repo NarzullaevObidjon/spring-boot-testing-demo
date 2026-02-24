@@ -35,7 +35,7 @@ package jon.obid.testing.book.management;
  *   - andDo(print())      — print the full request/response to stdout for debugging
  *   - andReturn()         — retrieve the MvcResult for further manual inspection
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

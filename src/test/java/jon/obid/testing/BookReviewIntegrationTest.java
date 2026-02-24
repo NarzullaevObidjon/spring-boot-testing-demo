@@ -1,7 +1,7 @@
 package jon.obid.testing;
 
 /*
- * ── Phase 4: @SpringBootTest — Full Stack Integration Tests ──────────────────
+ * ── Phase 3: @SpringBootTest — Full Stack Integration Tests ──────────────────
  *
  *  Topic  : End-to-end HTTP testing against a real PostgreSQL database
  *  Layer  : Full stack — controllers, services, repositories, real database
@@ -10,7 +10,7 @@ package jon.obid.testing;
  *  Spring Boot 3.x notes:
  *   - @WebMvcTest includes Spring Security auto-configuration automatically — no
  *     @ImportAutoConfiguration needed, unlike Boot 4.x.
- *   - @MockBean is the standard annotation (Boot 3.x); @MockitoBean is the Boot 4.x replacement.
+ *   - @MockitoBean (Spring Framework 6.2 / Boot 3.4+) replaces the removed @MockBean.
  *   - @AutoConfigureMockMvc is at org.springframework.boot.test.autoconfigure.web.servlet.
  *   - Jackson 2.x (com.fasterxml.jackson.databind) — not used directly in this test.
  *
@@ -40,7 +40,7 @@ package jon.obid.testing;
  *     Spring Boot reuses the same ApplicationContext across tests that share
  *     the same context configuration, so the container is started only once.
  *
- *   @MockBean JwtDecoder
+ *   @MockitoBean JwtDecoder
  *     WebSecurityConfig configures a JWT resource server. Without a real Keycloak
  *     running, Spring Boot cannot auto-configure JwtDecoder from issuer-uri.
  *     Providing a mock satisfies the dependency and lets the SecurityFilterChain start.
@@ -81,13 +81,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -122,8 +122,8 @@ class BookReviewIntegrationTest {
   }
 
   // No real Keycloak available → mock the JwtDecoder bean so the SecurityFilterChain starts.
-  // Boot 3.x: @MockBean (replaced by @MockitoBean in Boot 4.x).
-  @MockBean
+  // @MockitoBean is available from Spring Framework 6.2 (Spring Boot 3.4+).
+  @MockitoBean
   JwtDecoder jwtDecoder;
 
   @Autowired MockMvc mockMvc;

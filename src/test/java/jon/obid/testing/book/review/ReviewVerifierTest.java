@@ -26,7 +26,7 @@ package jon.obid.testing.book.review;
  *   Hamcrest           — MatcherAssert.assertThat    (composable matcher DSL)
  *   AssertJ            — Assertions.assertThat       (fluent chaining, IDE-friendly)
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

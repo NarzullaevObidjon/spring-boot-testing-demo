@@ -1,7 +1,6 @@
 # Spring Boot Testing Masterclass
 
-> **Author:** Obidjon Sattarov — obidsattarovich3600@gmail.com
-> **Stack:** Spring Boot 4.0.3 · Java 21 · JUnit 5 · Mockito 5 · Testcontainers 1.21
+> **Stack:** Spring Boot 2.4.13 · Java 17 · JUnit 5 · Mockito 5 · Testcontainers 1.21
 
 This project is a structured, progressive guide to testing a Spring Boot application.
 Every test file is a self-contained lesson. Work through them in the order listed below
@@ -30,7 +29,7 @@ and you will cover every major testing technique used in professional Spring Boo
 7. [Phase 3 — Integration Test (Full Spring Context)](#phase-3--integration-test-full-spring-context)
    - [Step 11: TestingApplicationTests](#step-11-testingapplicationtests)
 8. [Supporting Test Resources](#supporting-test-resources)
-9. [Key Spring Boot 4.x Changes](#key-spring-boot-4x-changes)
+9. [Version Compatibility Notes](#version-compatibility-notes)
 10. [Dependency Reference](#dependency-reference)
 
 ---
@@ -39,7 +38,7 @@ and you will cover every major testing technique used in professional Spring Boo
 
 | Requirement | Version | Notes |
 |-------------|---------|-------|
-| Java | 21+ | Project uses `--release 21`; Java 25 compiles fine |
+| Java | 17+ | Text blocks and other Java 15+ features used in the project |
 | Maven | 3.9+ | Use the included `mvnw` wrapper |
 | Docker Desktop | latest | Required **only** for `ReviewRepositoryNoInMemoryTest` |
 
@@ -351,17 +350,14 @@ this.mockMvc
 2. XML `Accept` header → `406 Not Acceptable`
 3. Two books returned → JSON array with correct fields, `id` hidden
 
-**Spring Boot 4.x note:** `@WebMvcTest` no longer auto-includes Spring Security
-auto-configuration. It must be added explicitly:
+**Spring Boot 2.x note:** `@WebMvcTest` automatically includes Spring Security
+auto-configuration — no `@ImportAutoConfiguration` is needed. Only the custom
+`WebSecurityConfig` must be brought in explicitly via `@Import`:
 ```java
 @WebMvcTest(BookController.class)
 @Import(WebSecurityConfig.class)
-@ImportAutoConfiguration({
-    SecurityAutoConfiguration.class,
-    SecurityFilterAutoConfiguration.class,
-    ServletWebSecurityAutoConfiguration.class
-})
 ```
+> In Spring Boot 4.x this changes: security auto-configuration must be added manually via `@ImportAutoConfiguration`.
 
 ---
 
@@ -562,13 +558,15 @@ Loaded at class-load time in a `static {}` block to avoid repeated I/O across te
 that intercepts `RestTemplate` calls at the Spring level. No actual network activity
 occurs.
 
-**Spring Boot 4.x gotcha — `RestTemplate` is no longer auto-registered:**
+**`RestTemplate` must be provided explicitly:**
 ```java
 @RestClientTest(OpenLibraryRestTemplateApiClient.class)
 class OpenLibraryRestTemplateApiClientTest {
 
-    // Boot 4.x: RestTemplateAutoConfiguration only registers RestTemplateBuilder, not RestTemplate.
+    // RestTemplateAutoConfiguration registers RestTemplateBuilder, not a RestTemplate bean.
     // We provide the bean explicitly so MockRestServiceServer can wire into it.
+    // Uses Boot 2.x / 3.x package: org.springframework.boot.web.client.RestTemplateBuilder
+    // (moved to org.springframework.boot.restclient.RestTemplateBuilder in Boot 4.x)
     @TestConfiguration
     static class RestTemplateConfig {
         @Bean
@@ -628,9 +626,10 @@ void contextLoads() {
 **JwtDecoder mock:**
 ```java
 // No Keycloak runs during tests — JwtDecoder cannot be auto-configured from issuer-uri.
-// @MockitoBean replaces the auto-configured bean with a Mockito mock so the
+// @MockBean replaces the auto-configured bean with a Mockito mock so the
 // SecurityFilterChain can start without a live identity provider.
-@MockitoBean
+// Note: renamed to @MockitoBean in Spring Boot 3.4+ / 4.x.
+@MockBean
 JwtDecoder jwtDecoder;
 ```
 
@@ -664,20 +663,22 @@ appears in your test console alongside Spring's log output).
 
 ---
 
-## Key Spring Boot 4.x Changes
+## Version Compatibility Notes
 
-This project uses Spring Boot **4.0.3**, which has several breaking changes compared
-to 3.x. These are all addressed in the test code and documented inline.
+This project runs on Spring Boot **2.4.13** with **Java 17**. The test code was
+originally written for Spring Boot 4.0.3 and has been adapted to 2.4.x. The table
+below shows what changes when you move to newer versions — useful if you follow along
+with a newer branch of this course.
 
-| Change | Boot 3.x | Boot 4.x |
-|--------|----------|----------|
-| Jackson group ID | `com.fasterxml.jackson.databind` | `tools.jackson.databind` |
-| `@MockBean` | `org.springframework.boot.test.mock.mockito.MockBean` | `@MockitoBean` via `@TestContext` |
-| `RestTemplateBuilder` package | `org.springframework.boot.web.client` | `org.springframework.boot.restclient` |
-| `@WebMvcTest` + security | Auto-included | Must add `@ImportAutoConfiguration` explicitly |
-| `RestTemplate` in `@RestClientTest` | Auto-registered | Must provide `@TestConfiguration` bean |
-| Test slice starters | Bundled in `spring-boot-starter-test` | Separate starters: `spring-boot-starter-webmvc-test`, `spring-boot-starter-data-jpa-test`, `spring-boot-starter-restclient-test` |
-| JWT resource server auto-config | `spring-security-oauth2-jose` | `spring-boot-starter-oauth2-resource-server` |
+| Area | Spring Boot 2.4.x (this branch) | Spring Boot 3.x | Spring Boot 4.x |
+|------|---------------------------------|-----------------|-----------------|
+| JPA / Validation annotations | `javax.persistence.*`, `javax.validation.*` | `jakarta.persistence.*`, `jakarta.validation.*` | `jakarta.*` |
+| `@MockBean` | `@MockBean` | `@MockBean` (deprecated in 3.4) | `@MockitoBean` |
+| `@WebMvcTest` + security | Auto-included | Auto-included | Must add `@ImportAutoConfiguration` explicitly |
+| `RestTemplateBuilder` package | `org.springframework.boot.web.client` | `org.springframework.boot.web.client` | `org.springframework.boot.restclient` |
+| Test slice starters | Bundled in `spring-boot-starter-test` | Bundled in `spring-boot-starter-test` | Separate starters per slice |
+| Mockito (overridden) | **5.11.0** (override required — 3.6.x doesn't support Java 17/21) | 5.x (bundled) | 5.x (bundled) |
+| ByteBuddy (overridden) | **1.14.18** (override required — 1.10.x missing `GraalImageCode`) | 1.14.x (bundled) | 1.14.x (bundled) |
 
 ---
 
@@ -685,10 +686,7 @@ to 3.x. These are all addressed in the test code and documented inline.
 
 | Dependency | Purpose |
 |------------|---------|
-| `spring-boot-starter-test` | JUnit 5, Mockito, AssertJ, Hamcrest, MockMvc |
-| `spring-boot-starter-webmvc-test` | `@WebMvcTest` slice (Boot 4.x separate starter) |
-| `spring-boot-starter-data-jpa-test` | `@DataJpaTest` slice (Boot 4.x separate starter) |
-| `spring-boot-starter-restclient-test` | `@RestClientTest` slice (Boot 4.x separate starter) |
+| `spring-boot-starter-test` | JUnit 5, Mockito 5.11.0 (overridden), AssertJ, Hamcrest, MockMvc, `@WebMvcTest`, `@DataJpaTest`, `@RestClientTest` |
 | `spring-security-test` | `.with(jwt())`, `SecurityMockMvcRequestPostProcessors` |
 | `testcontainers-bom` + `postgresql` | Real PostgreSQL via Docker |
 | `testcontainers:junit-jupiter` | `@Testcontainers`, `@Container` lifecycle management |

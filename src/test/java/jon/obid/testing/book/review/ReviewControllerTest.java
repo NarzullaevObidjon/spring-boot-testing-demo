@@ -28,7 +28,7 @@ package jon.obid.testing.book.review;
  *   - No @ImportAutoConfiguration needed — security is auto-included in 2.x slices
  *   - Jackson 2.x: com.fasterxml.jackson (not tools.jackson from Boot 4.x)
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

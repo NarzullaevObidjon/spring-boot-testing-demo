@@ -19,7 +19,7 @@ package jon.obid.testing.book.management;
  *   Here we use the Boot 2.x / 3.x location:
  *     org.springframework.boot.web.client.RestTemplateBuilder
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

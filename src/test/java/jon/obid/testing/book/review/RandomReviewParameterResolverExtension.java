@@ -20,7 +20,7 @@ package jon.obid.testing.book.review;
  *  into @RepeatedTest methods, demonstrating custom extensions and randomised
  *  test input at the same time.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

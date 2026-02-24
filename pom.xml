@@ -24,6 +24,10 @@
         <selenium.version>4.33.0</selenium.version>
         <commons-lang3.version>3.17.0</commons-lang3.version>
         <okhttp.version>4.11.0</okhttp.version>
+        <!-- Override Mockito: 3.6.x doesn't know Java 21 (Unknown Java version: 21) -->
+        <mockito.version>5.11.0</mockito.version>
+        <!-- Override ByteBuddy: 1.10.x (Boot 2.4.x) missing GraalImageCode needed by Mockito 5.x -->
+        <byte-buddy.version>1.14.18</byte-buddy.version>
     </properties>
 
     <dependencyManagement>
@@ -107,13 +111,8 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- mockito-inline enables Mockito.mockStatic() in Mockito 3.x (managed by Boot 2.4.x).
-             In Mockito 5.x (Boot 3.x+) static mocking is included in mockito-core by default. -->
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <scope>test</scope>
-        </dependency>
+
+
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
@@ -172,6 +171,17 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>
+                        -Djdk.attach.allowAttachSelf=true
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                        --add-opens java.base/java.time=ALL-UNNAMED
+                    </argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>

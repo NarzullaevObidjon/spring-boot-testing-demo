@@ -20,7 +20,7 @@ package jon.obid.testing.book.review;
  *
  *   EntityManager uses javax.persistence in Boot 2.x (jakarta.persistence in Boot 3.x+).
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

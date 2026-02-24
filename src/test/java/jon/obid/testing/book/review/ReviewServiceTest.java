@@ -24,7 +24,7 @@ package jon.obid.testing.book.review;
  *   assertThrows(...)            — verify that the code throws the expected exception
  *   verify(..., times(0)).save() — assert that a method was NEVER called
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

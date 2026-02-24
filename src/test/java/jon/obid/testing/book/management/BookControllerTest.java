@@ -21,7 +21,7 @@ package jon.obid.testing.book.management;
  *  @MockBean (Boot 2.x / 3.x) registers a Mockito mock as a Spring bean.
  *  Note: renamed @MockitoBean in Spring Boot 3.4+ / Boot 4.x.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 

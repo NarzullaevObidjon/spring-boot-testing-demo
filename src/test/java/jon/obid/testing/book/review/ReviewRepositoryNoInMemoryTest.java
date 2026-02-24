@@ -17,7 +17,7 @@ package jon.obid.testing.book.review;
  *     Boot 4.x: org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest
  *   Here we use the Boot 2.x (and 3.x) location.
  *
- *  Author : Obidjon Sattarov <obidsattarovich3600@gmail.com>
+ *  
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
